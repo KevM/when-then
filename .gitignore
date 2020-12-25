@@ -1,0 +1,7 @@
+obj
+bin
+.vs
+.vscode
+*.DotSettings
+*.user
+*.xml
