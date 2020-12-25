@@ -1,0 +1,64 @@
+@page "/fetchdata"
+@inject HttpClient Http
+
+<h1>Weather forecast</h1>
+
+<p>This component demonstrates fetching data from the server.</p>
+
+@if (whens == null || thens == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <h2>When</h2>
+    <p>@when</p>
+
+    <h2>Then</h2>
+    <p>@then</p>
+
+    <button class="btn btn-primary" @onclick="OnClick">Next!</button>
+}
+
+@code {
+    private int whenDex = 0;
+    private string[] whens;
+    private string when;
+
+    private int thenDex = 0;
+    private string[] thens;
+    private string then;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var data = await Http.GetStringAsync("sample-data/when.csv");
+        var lines = data.Split(Environment.NewLine);
+        var w = lines.Select(x => x.Split(',')[1]);
+        whens = MSSystemExtenstions.Shuffle(w).ToArray();
+
+        data = await Http.GetStringAsync("sample-data/then.csv");
+        lines = data.Split(Environment.NewLine);
+        var t = lines.Select(x => x.Split(',')[1]);
+        thens = MSSystemExtenstions.Shuffle(t).ToArray();
+
+        OnClick();
+    }
+
+    private void OnClick()
+    {
+        when = GetWhen();
+        then = GetThen();
+    }
+
+    private string GetWhen()
+    {
+        if (whenDex == whens.Length) whenDex = 0;
+        return whens[whenDex++];
+    }
+
+    private string GetThen()
+    {
+        if (thenDex == thens.Length) thenDex = 0;
+        return thens[thenDex++];
+    }
+}
