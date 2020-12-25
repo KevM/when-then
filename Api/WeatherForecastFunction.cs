@@ -7,6 +7,8 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 
 using BlazorApp.Shared;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace BlazorApp.Api
 {
@@ -48,6 +50,20 @@ namespace BlazorApp.Api
             }).ToArray();
 
             return new OkObjectResult(result);
+        }
+
+        [FunctionName("WhenThen")]
+        public static async Task<IActionResult> WhenThen(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req,
+            ILogger log)
+        {
+            var whenCsvs = await File.ReadAllLinesAsync("when.csv");
+            var whens = whenCsvs.Select(x => x.Split(',')[1]).ToArray();
+
+            var thenCsvs = await File.ReadAllLinesAsync("then.csv");
+            var thens = thenCsvs.Select(x => x.Split(',')[1]).ToArray();
+
+            return new OkObjectResult(new WhenThen(whens, thens));
         }
     }
 }
